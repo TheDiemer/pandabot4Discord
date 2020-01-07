@@ -10,10 +10,21 @@ load_dotenv()
 token = os.getenv('DISCORD_TOKEN')
 bot = commands.Bot(command_prefix='.')
 
+global users
+users = {}
 
 @bot.event
 async def on_ready():
     print(f'{bot.user} has connected to Discord!')
+    userList = bot.get_all_members()
+    while True:
+         try:
+             tmp = next(userList)
+             users[tmp.id] = {'name': tmp.name, 'discriminator': tmp.discriminator, 'nick': tmp.nick}
+         except StopIteration:
+             print('Done! Check out the users dict')
+             break
+    print(users)
 
 
 @bot.event
@@ -23,19 +34,26 @@ async def on_message(message):
     if 'test' in message.content.lower():
         await message.channel.send('Bingpot!')
     if '--' in message.content or '++' in message.content or '~~' in message.content or '``' in message.content:
-        await karma.karmaChange(message)
+        #if '<@!' in message.content:
+        #    user = message.content.split('<@!')[1].split('>')[0]
+        #    print(user)
+        #    print(users.get(int(user)))
+        #print(message.content.split('++')[0].split('!')[1])
+        #a = await bot.fetch_user(int(message.content.split('++')[0].split('!')[1]))
+        #print(a.username)
+        await karma.karmaChange(message, users)
 
     await bot.process_commands(message)
 
 
 @bot.command(name='alias', help='For making someone known as something else!      `.alias ALIAS OG_NICK`')
 async def alias(ctx, alias, nick):
-    await karma.addAlias(ctx, alias, nick)
+    await karma.addAlias(ctx, alias, nick, users)
 
 
-@bot.command(name='clear', help='For removing an alias!      `.clear ALIAS`')
-async def clear(ctx, alias):
-    await karma.delAlias(ctx, alias)
+#@bot.command(name='clear', help='For removing an alias!      `.clear ALIAS`')
+#async def clear(ctx, alias):
+#   await karma.delAlias(ctx, alias)
 
 
 @bot.command(name='anger', help='Be angry at people!      `.anger <Target>`')

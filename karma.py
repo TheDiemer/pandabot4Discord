@@ -9,7 +9,10 @@ dbPass = os.getenv('DB_PASSWORD')
 
 
 def filter(name, sender):
-    if name.lower() == 'me':
+    if '<@!' in name:
+        user = name.split('<@!')[1].split('>')[0]
+        person = (users.get(int(user)).get('name'), False)
+    elif name.lower() == 'me':
         person = (sender, True)
     else:
         person = (name, False)
@@ -44,7 +47,9 @@ def change(person, column, decrement=False):
     return rankData
 
 
-async def karmaChange(message):
+async def karmaChange(message, userList):
+    global users
+    users = userList
     positive = []
     negative = []
     shame = []
@@ -188,7 +193,9 @@ async def karmaChange(message):
 #                )
 #
 #
-async def addAlias(ctx, alias, target):
+async def addAlias(ctx, alias, target, userList):
+    global users
+    users = userList
     newAlias = emoji.demojize(alias)
     name = emoji.demojize(target)
     karmaDB = karma_api(ip=dbIP, username=dbUser, password=dbPass, db='karma')
@@ -218,7 +225,9 @@ async def addAlias(ctx, alias, target):
     )
 
 
-async def delAlias(ctx, alias):
+async def delAlias(ctx, alias, userList):
+    global users
+    users = userList
     removeAlias = emoji.demojize(alias)
     print(removeAlias)
     karmaDB = karma_api(ip=dbIP, username=dbUser, password=dbPass, db='karma')
