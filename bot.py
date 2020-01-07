@@ -34,17 +34,24 @@ async def on_message(message):
     if 'test' in message.content.lower():
         await message.channel.send('Bingpot!')
     if '--' in message.content or '++' in message.content or '~~' in message.content or '``' in message.content:
-        #if '<@!' in message.content:
-        #    user = message.content.split('<@!')[1].split('>')[0]
-        #    print(user)
-        #    print(users.get(int(user)))
-        #print(message.content.split('++')[0].split('!')[1])
-        #a = await bot.fetch_user(int(message.content.split('++')[0].split('!')[1]))
-        #print(a.username)
         await karma.karmaChange(message, users)
 
     await bot.process_commands(message)
 
+
+@bot.event
+async def on_member_join(member):
+    await member.create_dm()
+    await member.dm_channel.send(
+        f"Hi {member.name}, Welcome to Mad Hatters! Most of the roles you see on the server are things you can either add yourself or ask in the channel to get added to! We primarily use them for highlights! Feel free to explore and use #nack to ask questions!!!"
+    )
+    print(users)
+    users[member.id] = {'name': member.name, 'discriminator': member.discriminator, 'nick': member.nick}
+    print(member)
+    print(member.id)
+    print(member.name)
+    print(member.discriminator)
+    print(member.nick)
 
 @bot.command(name='alias', help='For making someone known as something else!      `.alias ALIAS OG_NICK`')
 async def alias(ctx, alias, nick):
