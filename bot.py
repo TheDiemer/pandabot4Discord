@@ -5,6 +5,7 @@ import requests
 from discord.ext import commands
 from dotenv import load_dotenv
 import karma
+import quotes
 
 load_dotenv()
 token = os.getenv('DISCORD_TOKEN')
@@ -77,6 +78,15 @@ async def test(ctx):
     print("context:{0}".format(ctx))
     await ctx.send('Bingpot!')
 
+
+@bot.command(name='quote', help='For quote things!')
+async def quote(ctx, target=None):
+    await quotes.getQuote(ctx, target)
+
+
+@bot.command(name='findquote', help='Find quotes with the searchword')
+async def findQuote(ctx, search):
+    await quotes.findQuote(ctx, search, users)
 
 @bot.command(name='roll', help='For rolling Dice.      `.roll number_of_dice number_of_sides`')
 async def roll(ctx, number_of_dice: int, number_of_sides: int):
