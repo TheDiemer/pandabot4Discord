@@ -2,10 +2,12 @@ import os
 import discord
 import random
 import requests
+import math
 from discord.ext import commands
 from dotenv import load_dotenv
 import karma
 import quotes
+import DL
 
 load_dotenv()
 token = os.getenv('DISCORD_TOKEN')
@@ -23,9 +25,7 @@ async def on_ready():
              tmp = next(userList)
              users[tmp.id] = {'name': tmp.name, 'discriminator': tmp.discriminator, 'nick': tmp.nick}
          except StopIteration:
-             print('Done! Check out the users dict')
              break
-    print(users)
 
 
 @bot.event
@@ -46,13 +46,16 @@ async def on_member_join(member):
     await member.dm_channel.send(
         f"Hi {member.name}, Welcome to Mad Hatters! Most of the roles you see on the server are things you can either add yourself or ask in the channel to get added to! We primarily use them for highlights! Feel free to explore and use #nack to ask questions!!!"
     )
-    print(users)
     users[member.id] = {'name': member.name, 'discriminator': member.discriminator, 'nick': member.nick}
-    print(member)
-    print(member.id)
-    print(member.name)
-    print(member.discriminator)
-    print(member.nick)
+    print(f"Added {member.name} to the user list")
+
+@bot.command(name='score', help='For checking in on the score for our Team!')
+async def duolingoScore(ctx):
+    print(ctx.message.channel)
+    if str(ctx.message.channel) == 'polyglots':
+        print('made it here')
+        await DL.score(ctx)
+
 
 @bot.command(name='alias', help='For making someone known as something else!      `.alias ALIAS OG_NICK`')
 async def alias(ctx, alias, nick):
@@ -71,6 +74,15 @@ async def anger(ctx, target):
     else:
         response = "(ಠ益ಠ)ᕗ {0}".format(target)
     await ctx.send(response)
+
+
+@bot.command(name='quorum', help='This is to decide if quorum has been made.      `.quorum <yes> <members>`')
+async def quorum(ctx, yes=0, members=0):
+    quorumCalc = math.floor(members/2) + 1
+    if yes >= quorumCalc:
+        await ctx.send('Quorum is met!')
+    else:
+        await ctx.send(f"No quorum! {quorumCalc} of {members} must agree!")
 
 
 @bot.command(name='test', help='This is a testing command.      `.test`')

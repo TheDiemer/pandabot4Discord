@@ -66,30 +66,47 @@ async def karmaChange(message, userList):
             shame.append(single)
         if '``' in single:
             shade.append(single)
+    print(f"positive: {positive}")
+    print(f"negative: {negative}")
+    print(f"shame: {shame}")
+    print(f"shade: {shade}")
     up = []
     down = []
     shameUp = []
     shadeUp = []
     for one in positive:
-        tmp = one.split('+')
-        while("" in tmp):
-            tmp.remove("")
-        up.append(emoji.demojize(tmp[0]))
+        if one[0] == '+':
+            pass
+        else:
+            tmp = one.split('+')
+            while("" in tmp):
+                tmp.remove("")
+            up.append(emoji.demojize(tmp[0]))
     for one in negative:
-        tmp = one.split('-')
-        while("" in tmp):
-            tmp.remove("")
-        down.append(emoji.demojize(tmp[0]))
+        if one[0] == '-':
+            pass
+        else:
+            tmp = one.split('-')
+            while("" in tmp):
+                tmp.remove("")
+            print(f"tmp: {tmp}")
+            down.append(emoji.demojize(tmp[0]))
     for one in shame:
-        tmp = one.split('~')
-        while("" in tmp):
-            tmp.remove("")
-        shameUp.append(emoji.demojize(tmp[0]))
+        if one[0] == '~':
+            pass
+        else:
+            tmp = one.split('~')
+            while("" in tmp):
+                tmp.remove("")
+            shameUp.append(emoji.demojize(tmp[0]))
     for one in shade:
-        tmp = one.split('`')
-        while("" in tmp):
-            tmp.remove("")
-        shadeUp.append(emoji.demojize(tmp[0]))
+        if one[0] == '`':
+            pass
+        else:
+            tmp = one.split('`')
+            while("" in tmp):
+                tmp.remove("")
+            shadeUp.append(emoji.demojize(tmp[0]))
     for name in up:
         sender = str(message.author).split("#")[0]
         person = filter(name, sender)
