@@ -49,12 +49,15 @@ async def on_member_join(member):
     users[member.id] = {'name': member.name, 'discriminator': member.discriminator, 'nick': member.nick}
     print(f"Added {member.name} to the user list")
 
-@bot.command(name='score', help='For checking in on the score for our Team!')
-async def duolingoScore(ctx):
+@bot.command(name='score', help='For checking in on the score for our Team! Add `daily` afterwards to get the days scores')
+async def duolingoScore(ctx, target=None):
     print(ctx.message.channel)
     if str(ctx.message.channel) == 'polyglots':
         print('made it here')
-        await DL.score(ctx)
+        if target is None:
+            await DL.score(ctx)
+        elif target.lower() == 'daily':
+            await DL.daily(ctx)
 
 
 @bot.command(name='alias', help='For making someone known as something else!      `.alias ALIAS OG_NICK`')
