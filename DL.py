@@ -52,9 +52,19 @@ async def daily(ctx):
                     tmp += int(day['improvement'])
                     daily[user.get('username')] = tmp
     sortedDaily = {k: v for k, v in sorted(daily.items(), key=lambda item: item[1], reverse=True)}
-    message = "**Leaderboard for %s** \n>>> " % now
+    message = "**Leaderboard for %s** \n```css\n" % now
+    names = []
+    score = []
+    data = {}
     for person in sortedDaily:
-        message += '{0}: {1}\n'.format(person, sortedDaily[person])
+        names.append(person)
+        score.append(sortedDaily[person])
+    data['Name'] = names
+    data['Score'] = score
+    message += tabulate(data, headers="keys",tablefmt="fancy_grid", stralign="center",numalign="center")
+    message += "```"
+    #for person in sortedDaily:
+    #    message += '{0}: {1}\n'.format(person, sortedDaily[person])
     await ctx.channel.send(message)
 
 
