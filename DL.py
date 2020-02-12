@@ -23,6 +23,30 @@ def login():
     return session
 
 
+async def message(ctx, sortedData, content):
+    # TABLES
+    names = []
+    score = []
+    data = {}
+    for person in sortedData:
+        names.append(person)
+        score.append(sortedData[person])
+    data['Name'] = names
+    data['Score'] = score
+    content += tabulate(data, headers="keys",tablefmt="fancy_grid", stralign="center",numalign="center")
+    content += "```"
+
+    ## For the yellow/orange text with white score from apache
+    #for person in sortedData:
+    #    content += '{0}: {1}\n'.format(person, sortedData[person])
+    #content += "```"
+
+    ## For the inline code block
+    #for person in sortedData:
+    #    content += '{0}: {1}\n'.format(person, sortedData[person])
+    await ctx.channel.send(content)
+
+
 async def daily(ctx):
     url = "http://duolingo.com/users/"
     authed = login()
@@ -52,20 +76,15 @@ async def daily(ctx):
                     tmp += int(day['improvement'])
                     daily[user.get('username')] = tmp
     sortedDaily = {k: v for k, v in sorted(daily.items(), key=lambda item: item[1], reverse=True)}
-    message = "**Leaderboard for %s** \n```css\n" % now
-    names = []
-    score = []
-    data = {}
-    for person in sortedDaily:
-        names.append(person)
-        score.append(sortedDaily[person])
-    data['Name'] = names
-    data['Score'] = score
-    message += tabulate(data, headers="keys",tablefmt="fancy_grid", stralign="center",numalign="center")
-    message += "```"
-    #for person in sortedDaily:
-    #    message += '{0}: {1}\n'.format(person, sortedDaily[person])
-    await ctx.channel.send(message)
+    # Tables
+    content = "**Leaderboard for %s** \n```css\n" % now
+
+    ## Makes the text yellow/orange but leaves score white
+    #content = "**Leaderboard** \n```apache\n"
+    
+    ## Makes an inline code block (looks good)
+    #content = "**Leaderboard** \n>>> "
+    await message(ctx, sortedDaily, content)
 
 
 async def score(ctx):
@@ -88,28 +107,12 @@ async def score(ctx):
             score[friend] = 0
 
     sortedScore = {k: v for k, v in sorted(score.items(), key=lambda item: item[1], reverse=True)}
-    # Lets make the message!
     # TABLES
-    message = "**Leaderboard** \n```css\n"
-    names = []
-    score = []
-    data = {}
-    for person in sortedScore:
-        names.append(person)
-        score.append(sortedScore[person])
-    data['Name'] = names
-    data['Score'] = score
-    message += tabulate(data, headers="keys",tablefmt="fancy_grid", stralign="center",numalign="center")
-    message += "```"
+    content = "**Leaderboard** \n```css\n"
 
     ## Makes the text yellow/orange but leaves score white
-    #message = "**Leaderboard** \n```apache\n"
-    #for person in sortedScore:
-    #    message += '{0}: {1}\n'.format(person, sortedScore[person])
-    #message += "```"
+    #content = "**Leaderboard** \n```apache\n"
     
     ## Makes an inline code block (looks good)
-    #message = "**Leaderboard** \n>>> "
-    #for person in sortedScore:
-    #    message += '{0}: {1}\n'.format(person, sortedScore[person])
-    await ctx.channel.send(message)
+    #content = "**Leaderboard** \n>>> "
+    await message(ctx, sortedScore, content)
