@@ -3,11 +3,14 @@ import discord
 import random
 import requests
 import math
+import _thread
 from discord.ext import commands
 from dotenv import load_dotenv
 import karma
 import quotes
 import DL
+import covid19
+import isSomething
 
 load_dotenv()
 token = os.getenv('DISCORD_TOKEN')
@@ -23,7 +26,7 @@ async def on_ready():
     while True:
          try:
              tmp = next(userList)
-             users[tmp.id] = {'name': tmp.name, 'discriminator': tmp.discriminator, 'nick': tmp.nick}
+             users[str(tmp.id)] = {'name': tmp.name, 'discriminator': tmp.discriminator, 'nick': tmp.nick}
          except StopIteration:
              break
 
@@ -32,10 +35,38 @@ async def on_ready():
 async def on_message(message):
     if message.author == bot.user:
         return
-    if 'test' in message.content.lower():
-        await message.channel.send('Bingpot!')
+    #if 'test' in message.content.lower():
+     #   await message.channel.send('Bingpot!')
     if '--' in message.content or '++' in message.content or '~~' in message.content or '``' in message.content:
         await karma.karmaChange(message, users)
+    if ' is ' in message.content:
+        # time to make sure it was directed at pandabot
+        words = message.content.split()
+        try:
+            user = words[0].split('@')[1][1:][:-1]
+        except:
+            user = ''
+        person = users.get(user)
+        if person is not None:
+            if person.get('name') == 'pandabot':
+                things = message.content.split(words[0])[1].split(' is ')
+                print(f"I found that |{things[0][1:]}| is |{things[1]}|")
+                # NOTE that things[0] needs to trim the FIRST character
+                # things[0][1:]
+                await isSomething.addIs(message, things[0][1:], things[1])
+    if message.content[-1:] == '?':
+        # time to make sure it was directed at pandabot
+        words = message.content.split()
+        try:
+            user = words[0].split('@')[1][1:][:-1]
+        except:
+            user = ''
+        person = users.get(user)
+        if person is not None:
+            if person.get('name') == 'pandabot':
+                selected = message.content.split()[-1:][0][:-1]
+                await isSomething.getIs(message, selected)
+
 
     await bot.process_commands(message)
 
@@ -56,8 +87,15 @@ async def duolingoScore(ctx, target=None):
         print('made it here')
         if target is None:
             await DL.score(ctx)
+            #_thread.start_new_thread(await DL.score, (ctx,))
         elif target.lower() == 'daily':
             await DL.daily(ctx)
+            #_thread.start_new_thread(DL.daily, (ctx,))
+
+
+@bot.command(name='covid19', help='For checking in on covid19.')
+async def covidCheck(ctx, location=None):
+    await covid19.covid(ctx, location)
 
 
 @bot.command(name='alias', help='For making someone known as something else!      `.alias ALIAS OG_NICK`')
