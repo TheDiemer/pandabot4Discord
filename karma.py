@@ -9,8 +9,12 @@ dbPass = os.getenv('DB_PASSWORD')
 
 
 def filter(name, sender):
-    if '<@!' in name:
-        user = users.get(int(name.split('<@!')[1].split('>')[0]))
+    if '<@' in name:
+        person = name.split('<@')[1]
+        if person[0] == '!':
+            person = person[1:]
+        print(person)
+        user = users.get(person.split('>')[0])
         if user.get('nick', None):
             person = (user.get('nick'), False)
         else:

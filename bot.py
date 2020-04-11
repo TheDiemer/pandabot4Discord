@@ -42,28 +42,48 @@ async def on_message(message):
     if ' is ' in message.content:
         # time to make sure it was directed at pandabot
         words = message.content.split()
+        print(words)
         try:
-            user = words[0].split('@')[1][1:][:-1]
+            user = words[0].split('@')[1]
         except:
             user = ''
-        person = users.get(user)
+        person = users.get(user[1:][:-1])
+        person2 = users.get(user[:-1])
         if person is not None:
-            if person.get('name') == 'pandabot':
+            if person.get('name','') == 'pandabot':
                 things = message.content.split(words[0])[1].split(' is ')
                 print(f"I found that |{things[0][1:]}| is |{things[1]}|")
                 # NOTE that things[0] needs to trim the FIRST character
                 # things[0][1:]
                 await isSomething.addIs(message, things[0][1:], things[1])
+            else:
+                pass
+        elif person2 is not None:
+            if person2.get('name','') == 'pandabot':
+                things = message.content.split(words[0])[1].split(' is ')
+                print(f"I found that |{things[0][1:]}| is |{things[1]}|")
+                # NOTE that things[0] needs to trim the FIRST character
+                # things[0][1:]
+                await isSomething.addIs(message, things[0][1:], things[1])
+            else:
+                pass
+        else:
+            pass
     if message.content[-1:] == '?':
         # time to make sure it was directed at pandabot
         words = message.content.split()
         try:
-            user = words[0].split('@')[1][1:][:-1]
+            user = words[0].split('@')[1]
         except:
             user = ''
-        person = users.get(user)
+        person = users.get(user[1:][:-1])
+        person2 = users.get(user[:-1])
         if person is not None:
             if person.get('name') == 'pandabot':
+                selected = message.content.split()[-1:][0][:-1]
+                await isSomething.getIs(message, selected)
+        elif person2 is not None:
+            if person2.get('name') == 'pandabot':
                 selected = message.content.split()[-1:][0][:-1]
                 await isSomething.getIs(message, selected)
 
