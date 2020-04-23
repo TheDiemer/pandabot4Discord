@@ -15,10 +15,13 @@ def filter(name, sender):
             person = person[1:]
         print(person)
         user = users.get(person.split('>')[0])
-        if user.get('nick', None):
-            person = (user.get('nick'), False)
-        else:
-            person = (user.get('name'), False)
+        try:
+            if user.get('nick', None):
+                person = (user.get('nick'), False)
+            else:
+                person = (user.get('name'), False)
+        except:
+            person = (name, False)
     elif name.lower() == 'me':
         person = (sender, True)
     else:

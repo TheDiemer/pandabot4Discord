@@ -29,6 +29,7 @@ async def on_ready():
              users[str(tmp.id)] = {'name': tmp.name, 'discriminator': tmp.discriminator, 'nick': tmp.nick}
          except StopIteration:
              break
+    print(users)
 
 
 @bot.event
