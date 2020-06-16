@@ -130,13 +130,24 @@ async def alias(ctx, alias, nick):
 
 
 @bot.command(name='anger', help='Be angry at people!      `.anger <Target>`')
-async def anger(ctx, target):
+async def anger(ctx, target=None):
     if target is None:
         response = "(ಠ益ಠ)ᕗ {0}".format(ctx.author)
     else:
         response = "(ಠ益ಠ)ᕗ {0}".format(target)
     await ctx.send(response)
 
+@bot.command(name="beans", help="Share beans with someone.     .beans !target!")
+async def beans(ctx, target=None):
+    urls = {
+        0: "https://farm1.static.flickr.com/224/509478598_606e6a436d_o.jpg",
+        1: "https://i.redd.it/bcykiuff3lz41.jpg",
+    }
+    if target is None:
+        response = f"Hey {ctx.author}, {urls.get(random.randint(0,1000000)%2)}"
+    else:
+        response = f"Hey {target}, {urls.get(random.randint(0,1000000)%2)}"
+    await ctx.send(response)
 
 @bot.command(name='quorum', help='This is to decide if quorum has been made.      `.quorum <yes> <members>`')
 async def quorum(ctx, yes=0, members=0):
