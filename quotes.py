@@ -52,10 +52,12 @@ async def getQuote(ctx, selected):
 async def findQuote(ctx, search, users):
     quoteDB = quote_api(ip=dbIP, username=dbUser, password=dbPass, db='quotes')
     quotes = quoteDB.query(ask=f"SELECT * FROM quotes WHERE quote LIKE '%{search}%'")
-    if users.get(int(ctx.author.id)).get('nick', None) is not None:
-        user = users.get(int(ctx.author.id)).get('nick')
+    personID = str(ctx.author.id)
+    test = users.get(personID, "Empty")
+    if users.get(personID, None).get('nick', None) is not None:
+        user = users.get(personID).get('nick')
     else:
-        user = users.get(int(ctx.author.id)).get('name')
+        user = users.get(personID).get('name')
     await ctx.send(
         f"<@!{ctx.author.id}>, I found {len(quotes)} results with that phrase: {search}"
     )
