@@ -57,12 +57,12 @@ class karma_api:
     def checkAlias(self, person=None):
         if person is not None:
             conn, cursor = self.__connect(cursorOpen=False)
-            data = self.query(ask="select * from alias where alias REGEXP '(?(?=(.|\n|\r|\r\n)) ?|){0}(?(?=(.|\n|\r|\r\n)) |)';".format(person))
+            data = self.query(ask="select * from alias where alias = '{0}'".format(person))
             self.__close(conn=conn)
             if data == ():
                 return (False, None)
             for options in data:
-                if person in (options.get('alias')).split():
+                if person == options.get('alias'):
                     return (True, options.get('person'))
             return (False, None)
         else:

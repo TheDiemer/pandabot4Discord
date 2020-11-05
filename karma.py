@@ -226,8 +226,8 @@ async def addAlias(ctx, alias, target, userList):
     newAlias = emoji.demojize(alias)
     name = emoji.demojize(target)
     karmaDB = karma_api(ip=dbIP, username=dbUser, password=dbPass, db='karma')
-    alias = karmaDB.query(ask="select * from alias where person = '{0}';".format(name))
-    # This is the person's first alias!
+    alias = karmaDB.query(ask="select * from alias where alias = '{0}';".format(newAlias))
+    # this alias was not already in the db
     if alias == ():
         modified = karmaDB.modify(
             modification="INSERT INTO alias values('{0}', '{1}');".format(
@@ -235,21 +235,18 @@ async def addAlias(ctx, alias, target, userList):
                 newAlias,
             )
         )
-    # adding to their alias list
-    else:
-        alii = alias[0].get('alias')
-        new = alii + ' ' + newAlias
-        modified = karmaDB.modify(
-            modification="UPDATE alias SET alias = '{0}' where person = '{1}';".format(
-                new,
-                name,
+        await ctx.send("Thanks! {0} is now also known as {1}!".format(
+                emoji.emojize(name),
+                emoji.emojize(newAlias),
             )
         )
-    await ctx.send("Thanks! {0} is now also know as {1}!".format(
-            emoji.emojize(name),
-            emoji.emojize(newAlias),
+    # a nick already has this alias
+    else:
+        await ctx.send("Thanks! But {0} was already known as {1}!".format(
+                emoji.emojize(alias[0].get("person")),
+                emoji.emojize(newAlias),
+            )
         )
-    )
 
 
 async def delAlias(ctx, alias, userList):
