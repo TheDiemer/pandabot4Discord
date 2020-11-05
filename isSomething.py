@@ -21,8 +21,10 @@ async def addIs(ctx, something, somethingelse):
 
         
 async def getIs(ctx, something):
+    print(something)
     isDB = is_api(ip=dbIP, username=dbUser, password=dbPass, db='isdata')
     isSomething = isDB.query(ask=f"SELECT * FROM issomething WHERE something = '{something}'")
+    print(isSomething)
     if isSomething != ():
         # Its not empty, so there is somethingelse
         # if there is only the one, just say it

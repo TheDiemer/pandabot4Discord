@@ -81,7 +81,10 @@ async def on_message(message):
         person2 = users.get(user[:-1])
         if person is not None:
             if person.get('name') == 'pandabot':
-                selected = message.content.split()[-1:][0][:-1]
+                print(message.content)
+                #selected = message.content.split()[-1:][0][:-1]
+                selected = " ".join(message.content.split()[1:])[:-1]
+                print(selected)
                 await isSomething.getIs(message, selected)
         elif person2 is not None:
             if person2.get('name') == 'pandabot':
