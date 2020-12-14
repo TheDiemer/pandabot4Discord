@@ -276,7 +276,12 @@ async def getAlias(ctx, name):
     karmaDB = karma_api(ip=dbIP, username=dbUser, password=dbPass, db='karma')
     data = karmaDB.query(ask="select * from alias where person = '{0}';".format(name))
     if data == ():
-        await ctx.send('Sorry, that person doesn\'t appear to have any alii! Feel free to give them their first with .alias!')
+        data2 = karmaDB.query(ask="select * from alias where alias = '{0}';".format(name))
+        if data2 == ():
+            await ctx.send('Sorry, that person doesn\'t appear to have any alii! (Nor is it an alias) Feel free to give them their first with .alias!')
+        else:
+            message = "That doesn't *have* any alii, but it *is* one! {0} is an alias for {1}".format(name, data2[0].get("person"))
+            await ctx.send(message)
     else:
         alii = []
         for resp in data:
