@@ -127,9 +127,14 @@ async def alias(ctx, alias, nick):
     await karma.addAlias(ctx, alias, nick, users)
 
 
-#@bot.command(name='clear', help='For removing an alias!      `.clear ALIAS`')
-#async def clear(ctx, alias):
-#   await karma.delAlias(ctx, alias)
+@bot.command(name='clear', help='For removing an alias!      `.clear ALIAS`')
+async def clear(ctx, alias):
+   await karma.delAlias(ctx, alias, users)
+
+
+@bot.command(name='getalias', help='What is the full list of aliases for the given name? `.getalias nick`')
+async def getalias(ctx, name):
+    await karma.getAlias(ctx, name)
 
 
 @bot.command(name='anger', help='Be angry at people!      `.anger <Target>`')

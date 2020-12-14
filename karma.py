@@ -255,88 +255,40 @@ async def delAlias(ctx, alias, userList):
     removeAlias = emoji.demojize(alias)
     print(removeAlias)
     karmaDB = karma_api(ip=dbIP, username=dbUser, password=dbPass, db='karma')
-    data = karmaDB.query(ask="select * from alias where alias REGEXP '(?(?=(.|\n|\r|\r\n)) ?|){0}(?(?=(.|\n|\r|\r\n)) |)';".format(removeAlias))
+    data = karmaDB.query(ask="select * from alias where alias =  '{0}';".format(removeAlias))
     print('this data:{0}'.format(data))
     # This alias doesn't exist for anyone
     if data == ():
         await ctx.send("Well that was easy! No one was aliased to {0}".format(removeAlias))
     else:
-        # lets make sure we get the ACTUAL person
-        personSpot = -1
-        broken = False
-        for people in data:
-            print(people)
-            for alii in people.get("alias").split():
-                print(removeAlias.lower())
-                print(alii.lower())
-                if removeAlias.lower() == alii.lower():
-                    broken = True
-                    print(broken)
-                    break
-            if broken:
-                break
-            personSpot += 1
-        if broken == False:
-            await ctx.send("Well that was easy! No one was aliased to {0}".format(removeAlias))
-            sys.exit(1)
-        aliasList = data[personSpot].get("alias").split()
-        aliasList.remove(removeAlias)
-        # That was their LAST alias! So just delete it all
-        if aliasList == []:
-            mod = "delete from alias where person = '{0}'".format(
-                    data[personSpot].get("person")
-            )
-        else:
-            mod = "UPDATE alias SET alias = '{0}' where person = '{1}'".format(
-                    ' '.join(aliasList),
-                    data[personSpot].get("person"),
-            )
+        mod = "delete from alias where alias = '{0}';".format(removeAlias)
         karmaDB.modify(modification=mod)
         await ctx.send("Alright! {0} will no longer be known as {1}!".format(
-                data[personSpot].get("person"),
+                data[0].get("person"),
                 alias,
             )
         )
-#
-#
-#@commands('getalias','aliaswho')
-#@example('.getalias jonesin | .aliaswho gregR')
-#def getAlias(bot, trigger):
-#    thing = 0
-#    for channel in channelList:
-#        if channel in trigger.sender:
-#            thing+=1
-#        else:
-#            pass
-#    if thing > 0:
-#        if trigger.group(3) is None:
-#            bot.reply('Whose aliiii do you wanna see?')
-#        else:
-#            karmaDB = karma_api(ip=db.ip, username=db.username, password=db.password, db=db.db)
-#            data = karmaDB.query(ask="select * from alias where person = '{0}';".format(trigger.group(3)))
-#            if data == ():
-#                bot.reply('Sorry, that person doesn\'t appear to have any alii! Feel free to give them their first with .alias!')
-#            else:
-#                alii = data[0].get('alias').split()
-#                if len(alii) > 2:
-#                    aliimsg = "{0}, and {1}".format(', '.join(alii[:-1]), alii[-1])
-#                elif len(alii) == 2:
-#                    aliimsg = "{0} and {1}".format(alii[0], alii[1])
-#                else:
-#                    aliimsg = alii[0]
-#                message = "{0} is also known as {1}".format(
-#                    data[0].get('person'),
-#                    aliimsg,
-#                )
-#                if len(message) > 385:
-#                    messageParts = []
-#                    times = int(len(message)/385)
-#                    placeHolder = 0
-#                    while placeHolder <= times:
-#                        messageParts.append(message[(placeHolder*385):((placeHolder+1)*385)])
-#                        placeHolder += 1
-#                    bot.reply(messageParts[0])
-#                    for part in messageParts[1:]:
-#                        bot.say(part)
-#                else:
-#                    bot.say(message)
+
+
+async def getAlias(ctx, name):
+    name = emoji.demojize(name)
+    print(name)
+    karmaDB = karma_api(ip=dbIP, username=dbUser, password=dbPass, db='karma')
+    data = karmaDB.query(ask="select * from alias where person = '{0}';".format(name))
+    if data == ():
+        await ctx.send('Sorry, that person doesn\'t appear to have any alii! Feel free to give them their first with .alias!')
+    else:
+        alii = []
+        for resp in data:
+            alii.append(resp.get("alias"))
+        if len(alii) > 2:
+            aliimsg = "{0}, and {1}".format(', '.join(alii[:-1]), alii[-1])
+        elif len(alii) == 2:
+            aliimsg = "{0} and {1}".format(alii[0], alii[1])
+        else:
+            aliimsg = alii[0]
+        message = "{0} is also known as {1}".format(
+            data[0].get('person'),
+            aliimsg,
+        )
+        await ctx.send(message)
