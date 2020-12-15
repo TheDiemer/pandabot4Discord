@@ -6,11 +6,15 @@ import math
 import _thread
 from discord.ext import commands
 from dotenv import load_dotenv
+from datetime import datetime
+import asyncio
+import time
 import karma
 import quotes
 import DL
 import covid19
 import isSomething
+from questionsTool import questions_api
 
 load_dotenv()
 token = os.getenv('DISCORD_TOKEN')
@@ -30,6 +34,84 @@ async def on_ready():
          except StopIteration:
              break
     print(users)
+
+@bot.command(name="new_question", help="")
+async def add_questions(ctx, question, channel=""):
+    if ctx.author == os.getenv("OWNER"):
+        dbIP = os.getenv('DB_IP')
+        dbUser = os.getenv('DB_USERNAME')
+        dbPass = os.getenv('DB_PASSWORD')
+        questionsDB = questions_api(ip=dbIP, username=dbUser, password=dbPass, db="questions")
+        mod = 'insert into existential values(default, "{0}", "{1}", false'.format(question.replace("'", "\\'"), channel.replace("'", "\\'"))
+        questionsDB.modify(modification=mod)
+        await ctx.send("question Added!")
+
+async def daily_question():
+    channels = {
+        '#dnd': 654446991912206346,
+        '#general-gaming': 654753999907586058,
+        '#ac': 707272408645632020,
+        '#borderlands': 707272479101550684,
+        '#among-us': 760698098686885888,
+        '#themueller': 654497924121755661,
+        '#nack': 654447029925183498,
+        '#rdu': 655119793472405505,
+        '#hannibal': 655119856303210522,
+        '#talkingtech': 659770298803159051,
+        '#music': 681942244076421128,
+        '#capslock': 667775102951227413,
+        '#corona': 688492183275438134,
+        '#polyglots': 672449279851364369,
+        '#werk': 655059635199541260,
+        '#code': 697907185618780271,
+        '#pet_friends': 713519629250592891,
+        '#trees': 654824088124129288,
+        '#homeimprovement': 718124248803180604,
+        '#cars': 728014796620038184,
+        '#filmevision': 740442658367078461,
+        '#whatsthesubject': 667014858004496417,
+        '#storytellers': 737397728631324792,
+        '#starwars': 738097758480760853,
+        '#damnit': 778744161317683283,
+        '#general': 654446795077976090,
+        '#emoji': 707607654746554459,
+        '#bots': 655092075389517894,
+        '#council-chambers': 656269116092710918,
+    }
+    await asyncio.sleep(10)
+    while True:
+        now = datetime.strftime(datetime.now(), '%H')
+        print(f"the time loop starts now: {now}")
+        if now == os.getenv("SEND_TIME"):
+            dbIP = os.getenv('DB_IP')
+            dbUser = os.getenv('DB_USERNAME')
+            dbPass = os.getenv('DB_PASSWORD')
+            questionsDB = questions_api(ip=dbIP, username=dbUser, password=dbPass, db="questions")
+            ask = "select * from existential where asked = 0;"
+            data = questionsDB.query(ask=ask)
+            if data == ():
+                # tell me its empty and do nothing else
+                pass
+            else:
+                num = random.randint(0, len(data)-1)
+                question = "Hey <@&788466685199908897>, "
+                question += data[num].get("question")
+                channel = channels.get(data[num].get("channel"))
+                if channel is not None:
+                    channel = bot.get_channel("#" +str(channels.get(channel)))
+                else:
+                    channel = bot.get_channel(channels.get("#nack"))
+                await channel.send(question)
+                # now to update the DB to say we asked that question
+                mod = "UPDATE existential set asked = 1 where id = {0}".format(data[num].get("id"))
+                questionsDB.modify(modification=mod)
+            # If it IS the time, lets reset for a day
+            time = 86400
+        else:
+            # Otherwise, lets check again in an hour!
+            time = 3600
+        # now lets wait this thread for the given time
+        await asyncio.sleep(time)
 
 
 @bot.event
@@ -214,5 +296,7 @@ async def xkcd(ctx):
     random.seed()
     response = get_xkcd(random.randint(1, maxInt + 1))
     await ctx.send(response.get('url','Sorry, I had a problem :frown:'))
+
+bot.loop.create_task(daily_question())
 
 bot.run(token)
