@@ -105,6 +105,11 @@ async def daily_question():
                 # now to update the DB to say we asked that question
                 mod = "UPDATE existential set asked = 1 where id = {0}".format(data[num].get("id"))
                 questionsDB.modify(modification=mod)
+                # I also want to, periodically, send a secondary ping to remind people to give me their questions
+                ran = random.randint(0,250)
+                # This should mean AROUND a third of the time, it'll do things
+                if ran%3 == 0:
+                    channel.send("Hey, please send jonesin your questions to help keep this going!")
             # If it IS the time, lets reset for a day
             time = 86400
         else:
