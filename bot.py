@@ -1,10 +1,10 @@
 import os
-import discord
+import nextcord
 import random
 import requests
 import math
 import _thread
-from discord.ext import commands
+from nextcord.ext import commands
 from dotenv import load_dotenv
 from datetime import datetime
 import asyncio
@@ -101,7 +101,12 @@ async def daily_question():
                     channel = bot.get_channel("#" +str(channels.get(channel)))
                 else:
                     channel = bot.get_channel(channels.get("#nack"))
-                await channel.send(question)
+                print(f"printing channel {channel} to know where this should go")
+                try:
+                    await channel.send(question)
+                except AttributeError:
+                    channel = bot.get_channel(channels.get("#nack"))
+                    await channel.send(question)
                 # now to update the DB to say we asked that question
                 mod = "UPDATE existential set asked = 1 where id = {0}".format(data[num].get("id"))
                 questionsDB.modify(modification=mod)
@@ -237,11 +242,12 @@ async def beans(ctx, target=None):
     urls = {
         0: "https://farm1.static.flickr.com/224/509478598_606e6a436d_o.jpg",
         1: "https://i.redd.it/bcykiuff3lz41.jpg",
+        2: "https://i.redd.it/ne6jt50jwra61.jpg",
     }
     if target is None:
-        response = f"Hey {ctx.author}, {urls.get(random.randint(0,1000000)%2)}"
+        response = f"Hey {ctx.author}, {urls.get(random.randint(0,1000000)%3)}"
     else:
-        response = f"Hey {target}, {urls.get(random.randint(0,1000000)%2)}"
+        response = f"Hey {target}, {urls.get(random.randint(0,1000000)%3)}"
     await ctx.send(response)
 
 @bot.command(name='quorum', help='This is to decide if quorum has been made.      `.quorum <yes> <members>`')
@@ -261,7 +267,8 @@ async def test(ctx):
 
 @bot.command(name='quote', help='For quote things!')
 async def quote(ctx, target=None):
-    await quotes.getQuote(ctx, target)
+    await ctx.send('This has been deprecated, please use /quotes instead!')
+    # await quotes.getQuote(ctx, target)
 
 
 @bot.command(name='findquote', help='Find quotes with the searchword')
